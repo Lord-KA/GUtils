@@ -9,7 +9,7 @@
 #define ASSERT_LOG(expr, errCode, errMsg, logStream) ({                              \
     if (!(expr)) {                                                                    \
         fprintf((logStream),  "%s in %s!\n", errMsg, __func__);                        \
-        return (gList_status)(errCode);                                                 \
+        return (errCode);                                                               \
     }                                                                                    \
 })
 
@@ -46,13 +46,13 @@ static bool gPtrValid(const void* ptr)
     return true;
 }
 
-char* strnchr(const char *haystack, char needle, size_t lenght) 
+static char* strnchr(const char *haystack, char needle, size_t lenght) 
 {
     return (char*)memchr(haystack, needle, strnlen(haystack, lenght));
 
 }
 
-bool strnConsistsChrs(const char *haystack, const char* needles, size_t haystackLen, size_t needlesLen)
+static bool strnConsistsChrs(const char *haystack, const char* needles, size_t haystackLen, size_t needlesLen)
 {
     char *iter = (char*)needles;
     while ((iter - needles) < needlesLen && *iter != '\0') {
@@ -65,7 +65,7 @@ bool strnConsistsChrs(const char *haystack, const char* needles, size_t haystack
 
 #include <stdio.h>
 
-bool isInteger(const char *haystack) 
+static bool isInteger(const char *haystack) 
 {
     /* 
      * WARNING: haystack must be a null-terminated string
@@ -100,7 +100,7 @@ bool isInteger(const char *haystack)
         return false;
 }
 
-bool isDouble(const char *haystack) {
+static bool isDouble(const char *haystack) {
     /* 
      * WARNING: haystack must be a null-terminated string
      */
@@ -143,7 +143,7 @@ bool isDouble(const char *haystack) {
         return false;
 }
 
-bool getline(char *buffer, size_t bufferLen, FILE *in) 
+static bool getline(char *buffer, size_t bufferLen, FILE *in) 
 {
     assert(gPtrValid(buffer));
     assert(gPtrValid(in));
