@@ -6,12 +6,20 @@
 #include <stdio.h>
 #include <ctype.h>
 
+#ifndef NDEBUG
 #define ASSERT_LOG(expr, errCode, errMsg, logStream) ({                              \
     if (!(expr)) {                                                                    \
-        fprintf((logStream),  "%s in %s!\n", errMsg, __func__);                        \
-        return (errCode);                                                               \
-    }                                                                                    \
+        if (logStream != NULL)                                                         \
+            fprintf((logStream),  "%s in %s!\n", errMsg, __func__);                     \
+        return (errCode);                                                                \
+    }                                                                                     \
 })
+#else
+#define ASSERT_LOG(expr, errCode, errMsg, logStream)
+#endif
+
+#define CONCATENATE(A, B) A##_##B
+#define TEMPLATE(func, TYPE) CONCATENATE(func, TYPE)
 
 static bool gPtrValid(const void* ptr)       
 {
