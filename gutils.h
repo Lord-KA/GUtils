@@ -6,6 +6,14 @@
 #include <stdio.h>
 #include <ctype.h>
 
+
+/**
+ * @brief check is expression is true, otherwise writes error message to logStream and returnes provided error code
+ * @param expr expression to check
+ * @param errCode error code to return if false
+ * @param errMsg  s-ctyle null-terminated string with an error message to write to log stream
+ * @param logStream log stream to write message to
+ */
 #ifndef NDEBUG
 #define ASSERT_LOG(expr, errCode, errMsg, logStream) ({                              \
     if (!(expr)) {                                                                    \
@@ -18,9 +26,19 @@
 #define ASSERT_LOG(expr, errCode, errMsg, logStream)
 #endif
 
-#define CONCATENATE(A, B) A##_##B
+
+/** 
+ * @brief macro that are used in c-style pseudo-templates 
+ */
+#define CONCATENATE(A, B) A##_##B                   
 #define TEMPLATE(func, TYPE) CONCATENATE(func, TYPE)
 
+
+/**
+ * @brief checks if pointer is valid, that uses system-based checks if GUTILS_USE_PTR_SYS_CHECK defined
+ * @param ptr pointer to check
+ * @return true if valid, false otherwise
+ */
 static bool gPtrValid(const void* ptr)       
 {
     if (ptr == 0) {
@@ -54,12 +72,28 @@ static bool gPtrValid(const void* ptr)
     return true;
 }
 
+
+/**
+ * @brief finds the first occurrence of needle in haystack with known lenght
+ * @param haystack c-style string to check
+ * @param needle char to look for
+ * @lenght lenght of haystack string
+ */
 static char* strnchr(const char *haystack, char needle, size_t lenght) 
 {
     return (char*)memchr(haystack, needle, strnlen(haystack, lenght));
 
 }
 
+
+/**
+ * @brief checks if haystack has any chars from needles
+ * @haystack c-style string to check
+ * @needles   array of chars to search for
+ * @haystackLen length of haystack string
+ * @needlesLen  lenght of needles array
+ * @return true if haystack has a char from needle, false otherwise
+ */
 static bool strnConsistsChrs(const char *haystack, const char* needles, size_t haystackLen, size_t needlesLen)
 {
     char *iter = (char*)needles;
@@ -71,8 +105,12 @@ static bool strnConsistsChrs(const char *haystack, const char* needles, size_t h
     return 0;
 }
 
-#include <stdio.h>
 
+/**
+ * @brief checks if haystack is a correct integer with some surrounding spaces, supports hexadecimal and octal integers
+ * @haystack null-terminated c-style string to check
+ * @return true if it is a correct integer, false otherwise
+ */
 static bool isInteger(const char *haystack) 
 {
     /* 
@@ -108,6 +146,12 @@ static bool isInteger(const char *haystack)
         return false;
 }
 
+
+/**
+ * @brief checks if haystack is a correct double number with some surrounding spaces, supports scientific notation
+ * @haystack null-terminated c-style string to check
+ * @return true if it is a correct double, false otherwise
+ */
 static bool isDouble(const char *haystack) {
     /* 
      * WARNING: haystack must be a null-terminated string
@@ -151,6 +195,13 @@ static bool isDouble(const char *haystack) {
         return false;
 }
 
+/**
+ * @brief gets line from input stream and writes it in buffer with lenght bufferLen
+ * @brief buffer c-style string to write line to, will add NULL after the lines end
+ * @brief bufferLen lenght of the provided buffer
+ * @brief in filestream to read from
+ * @return 0 if finished successfully, 1 otherwise
+ */
 static bool getline(char *buffer, size_t bufferLen, FILE *in) 
 {
     assert(gPtrValid(buffer));
@@ -167,10 +218,10 @@ static bool getline(char *buffer, size_t bufferLen, FILE *in)
         c = fgetc(in);
     }
     if (ferror(in))
-        return 0;
+        return 1;
 finish:
     buffer[curLen++] = '\0';
-    return 1;
+    return 0;
 }
 
 
