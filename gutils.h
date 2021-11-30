@@ -233,7 +233,7 @@ finish:
  * @param direction equals 1 or -1 dependent on the intended direction of iterators 
  * @return -1 if first < second; 1 if first > second; 0 if first == second
  */
-int continuoslyCompare(char* firstIter, char* secondIter, int direction)
+int strSkpCmp(char* firstIter, char* secondIter, int direction)
 {
     assert(direction == 1 || direction == -1);
     assert(gPtrValid(firstIter));
