@@ -195,6 +195,7 @@ static bool isDouble(const char *haystack) {
         return false;
 }
 
+
 /**
  * @brief gets line from input stream and writes it in buffer with lenght bufferLen
  * @brief buffer c-style string to write line to, will add NULL after the lines end
@@ -224,5 +225,46 @@ finish:
     return 0;
 }
 
+
+/**
+ * @brief compares strings with skipping all space chars
+ * @param firstIter pointer (iterator) to one c-style string 
+ * @param secondIter pointer (iterator) to other c-style string 
+ * @param direction equals 1 or -1 dependent on the intended direction of iterators 
+ * @return -1 if first < second; 1 if first > second; 0 if first == second
+ */
+int continuoslyCompare(char* firstIter, char* secondIter, int direction)
+{
+    assert(direction == 1 || direction == -1);
+    assert(gPtrValid(firstIter));
+    assert(gPtrValid(secondIter));
+
+    while (*firstIter != '\0' && *secondIter != '\0') {
+        if (!isalpha(*(firstIter)))
+            firstIter += direction;
+        else if (!isalpha(*(secondIter)))
+            secondIter += direction;
+        else {
+            if (*(secondIter) < *(firstIter)) 
+               return 1;
+            if (*(secondIter) > *(firstIter))
+               return -1;
+            firstIter += direction;
+            secondIter += direction;
+        }
+    }
+    while (!isalpha(*firstIter) && *firstIter != '\0')
+        firstIter += direction;
+
+    while (!isalpha(*secondIter) && *secondIter != '\0')
+        secondIter += direction;
+
+    if (*firstIter < *secondIter) 
+        return -1;
+    else if (*firstIter > *secondIter)
+       return 1;
+
+    return 0;
+}
 
 #endif
