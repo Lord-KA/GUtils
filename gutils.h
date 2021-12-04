@@ -18,7 +18,7 @@
 #define ASSERT_LOG(expr, errCode, errMsg, logStream) ({                              \
     if (!(expr)) {                                                                    \
         if (logStream != NULL)                                                         \
-            fprintf((logStream),  "%s in %s!\n", errMsg, __func__);                     \
+            fprintf((logStream),  "%s in %s on line %d!\n", errMsg, __func__, __LINE__);\
         return (errCode);                                                                \
     }                                                                                     \
 })
@@ -211,6 +211,10 @@ static bool getline(char *buffer, size_t bufferLen, FILE *in)
     char c;
     size_t curLen = 0;
     c = fgetc(in);
+    if (ferror(in))
+        return 1;
+    if (c == '\n' && in == stdin)
+        c = fgetc(in);
     while (!feof(in) && c != '\n') {
         if (curLen < bufferLen - 1) 
             buffer[curLen++] = c;
