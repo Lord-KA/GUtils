@@ -72,16 +72,15 @@ static bool gPtrValid(const void* ptr)
     return true;
 }
 
-
 /**
- * @brief finds the first occurrence of needle in haystack with known lenght
+ * @brief finds the first occurrence of needle in haystack with known length
  * @param haystack c-style string to check
  * @param needle char to look for
- * @lenght lenght of haystack string
+ * @length length of haystack string
  */
-static char* strnchr(const char *haystack, char needle, size_t lenght) 
+static char* strnchr(const char *haystack, char needle, size_t length) 
 {
-    return (char*)memchr(haystack, needle, strnlen(haystack, lenght));
+    return (char*)memchr(haystack, needle, strnlen(haystack, length));
 
 }
 
@@ -91,7 +90,7 @@ static char* strnchr(const char *haystack, char needle, size_t lenght)
  * @haystack c-style string to check
  * @needles   array of chars to search for
  * @haystackLen length of haystack string
- * @needlesLen  lenght of needles array
+ * @needlesLen  length of needles array
  * @return true if haystack has a char from needle, false otherwise
  */
 static bool strnConsistsChrs(const char *haystack, const char* needles, size_t haystackLen, size_t needlesLen)
@@ -197,9 +196,9 @@ static bool isDouble(const char *haystack) {
 
 
 /**
- * @brief gets line from input stream and writes it in buffer with lenght bufferLen
+ * @brief gets line from input stream and writes it in buffer with length bufferLen
  * @brief buffer c-style string to write line to, will add NULL after the lines end
- * @brief bufferLen lenght of the provided buffer
+ * @brief bufferLen length of the provided buffer
  * @brief in filestream to read from
  * @return 0 if finished successfully, 1 otherwise
  */
@@ -232,7 +231,7 @@ finish:
 
 /**
  * @brief compares strings with skipping all space chars
- * @param firstIter pointer (iterator) to one c-style string 
+ * @param firstIter  pointer (iterator) to one c-style string 
  * @param secondIter pointer (iterator) to other c-style string 
  * @param direction equals 1 or -1 dependent on the intended direction of iterators 
  * @return -1 if first < second; 1 if first > second; 0 if first == second
@@ -244,9 +243,9 @@ int strSkpCmp(char* firstIter, char* secondIter, int direction)
     assert(gPtrValid(secondIter));
 
     while (*firstIter != '\0' && *secondIter != '\0') {
-        if (!isalpha(*(firstIter)))
+        if (!isspace(*(firstIter)))
             firstIter += direction;
-        else if (!isalpha(*(secondIter)))
+        else if (!isspace(*(secondIter)))
             secondIter += direction;
         else {
             if (*(secondIter) < *(firstIter)) 
@@ -257,10 +256,10 @@ int strSkpCmp(char* firstIter, char* secondIter, int direction)
             secondIter += direction;
         }
     }
-    while (!isalpha(*firstIter) && *firstIter != '\0')
+    while (!isspace(*firstIter) && *firstIter != '\0')
         firstIter += direction;
 
-    while (!isalpha(*secondIter) && *secondIter != '\0')
+    while (!isspace(*secondIter) && *secondIter != '\0')
         secondIter += direction;
 
     if (*firstIter < *secondIter) 
@@ -268,6 +267,117 @@ int strSkpCmp(char* firstIter, char* secondIter, int direction)
     else if (*firstIter > *secondIter)
        return 1;
 
+    return 0;
+}
+
+
+/**
+* @brief compares first N non-space chars in strings
+* @param firstIter  pointer (iterator) to one c-style string 
+* @param secondIter pointer (iterator) to other c-style string 
+* @param length number of non-space chars to compare
+* @return -1 if first < second; 1 if first > second; 0 if first == second
+*/
+int strnSkpCmp(char* firstIter, char* secondIter, size_t length)
+{
+    assert(gPtrValid(firstIter));
+    assert(gPtrValid(secondIter));
+
+    while (*firstIter != '\0' && *secondIter != '\0' && length > 0) {
+        if (isspace(*(firstIter)))
+            ++firstIter;
+        else if (isspace(*(secondIter)))
+            ++secondIter;
+        else {
+            --length;
+            if (*(secondIter) < *(firstIter)) 
+                return 1;
+            if (*(secondIter) > *(firstIter))
+                return -1;
+            ++firstIter;
+            ++secondIter;
+        }
+    }
+    if (length == 0)
+        return 0;
+
+    while (!isspace(*firstIter) && *firstIter != '\0')
+        ++firstIter;
+
+    while (!isspace(*secondIter) && *secondIter != '\0')
+        ++secondIter;
+
+    if (*firstIter < *secondIter) 
+        return -1;
+    else if (*firstIter > *secondIter)
+        return 1;
+
+   return 0;
+}
+
+
+/**
+ * @brief chechs if string is some form of YES with skipping spaces
+ * @param buffer string to check
+ * @return true if str is YES, false otherwise
+ */
+bool strIsYes(char *buffer) 
+{
+    assert(gPtrValid(buffer));
+    if (!strSkpCmp(buffer, "Yes", 1))
+        return 1;
+    if (!strSkpCmp(buffer, "YES", 1))
+        return 1;
+    if (!strSkpCmp(buffer, "yes", 1))
+        return 1;
+    if (!strSkpCmp(buffer, "Y",   1))
+        return 1;
+    if (!strSkpCmp(buffer, "y",   1))
+        return 1;
+    return 0;
+}
+
+
+/**
+ * @brief chechs if string is some form of NO with skipping spaces
+ * @param buffer string to check
+ * @return true if str is NO, false otherwise
+ */
+bool strIsNo(char *buffer) 
+{
+    assert(gPtrValid(buffer));
+    if (!strSkpCmp(buffer, "No", 1))
+        return 1;
+    if (!strSkpCmp(buffer, "NO", 1))
+        return 1;
+    if (!strSkpCmp(buffer, "no", 1))
+        return 1;
+    if (!strSkpCmp(buffer, "N",  1))
+        return 1;
+    if (!strSkpCmp(buffer, "n",  1))
+        return 1;
+    return 0;
+}
+
+
+/**
+ * @brief chechs if string is some form of QUIT with skipping spaces
+ * @param buffer string to check
+ * @return true if str is QUIT, false otherwise
+ */
+bool strIsQuit(char *buffer) 
+{
+    assert(gPtrValid(buffer));
+    if (!strSkpCmp(buffer, "Quit", 1))
+        return 1;
+    if (!strSkpCmp(buffer, "quit", 1))
+        return 1;
+    if (!strSkpCmp(buffer, "QUIT", 1))
+        return 1;
+    if (!strSkpCmp(buffer, "Q",    1))
+        return 1;
+    if (!strSkpCmp(buffer, "q",    1))
+        return 1;
     return 0;
 }
 
