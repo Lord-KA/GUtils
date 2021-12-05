@@ -243,9 +243,9 @@ int strSkpCmp(char* firstIter, char* secondIter, int direction)
     assert(gPtrValid(secondIter));
 
     while (*firstIter != '\0' && *secondIter != '\0') {
-        if (!isspace(*(firstIter)))
+        if (isspace(*(firstIter)))
             firstIter += direction;
-        else if (!isspace(*(secondIter)))
+        else if (isspace(*(secondIter)))
             secondIter += direction;
         else {
             if (*(secondIter) < *(firstIter)) 
@@ -256,10 +256,10 @@ int strSkpCmp(char* firstIter, char* secondIter, int direction)
             secondIter += direction;
         }
     }
-    while (!isspace(*firstIter) && *firstIter != '\0')
+    while (isspace(*firstIter) && *firstIter   != '\0')
         firstIter += direction;
 
-    while (!isspace(*secondIter) && *secondIter != '\0')
+    while (isspace(*secondIter) && *secondIter != '\0')
         secondIter += direction;
 
     if (*firstIter < *secondIter) 
@@ -301,10 +301,10 @@ int strnSkpCmp(char* firstIter, char* secondIter, size_t length)
     if (length == 0)
         return 0;
 
-    while (!isspace(*firstIter) && *firstIter != '\0')
+    while (isspace(*firstIter) && *firstIter   != '\0')
         ++firstIter;
 
-    while (!isspace(*secondIter) && *secondIter != '\0')
+    while (isspace(*secondIter) && *secondIter != '\0')
         ++secondIter;
 
     if (*firstIter < *secondIter) 
