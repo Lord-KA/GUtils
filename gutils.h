@@ -410,10 +410,6 @@ static bool strIsComb(const char *str, const char *comb)
     arr[4][0] = lower(buffer)[0];
     arr[4][1] = '\0';
       
-    for (size_t i = 0; i < arrLen; ++i) {
-        fprintf(stderr, "%d. #%s#\n", i, arr[i]);
-    }
-      
     return strInArr(str, (char *)arr, lineLen, arrLen);
 }
 
