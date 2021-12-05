@@ -235,7 +235,7 @@ finish:
  * @param direction equals 1 or -1 dependent on the intended direction of iterators 
  * @return -1 if first < second; 1 if first > second; 0 if first == second
  */
-int strSkpCmp(const char* firstIter, const char* secondIter, int direction)
+static int strSkpCmp(const char* firstIter, const char* secondIter, int direction)
 {
     assert(direction == 1 || direction == -1);
     assert(gPtrValid(firstIter));
@@ -277,7 +277,7 @@ int strSkpCmp(const char* firstIter, const char* secondIter, int direction)
 * @param length number of non-space chars to compare
 * @return -1 if first < second; 1 if first > second; 0 if first == second
 */
-int strnSkpCmp(const char* firstIter, const char* secondIter, size_t length)
+static int strnSkpCmp(const char* firstIter, const char* secondIter, size_t length)
 {
     assert(gPtrValid(firstIter));
     assert(gPtrValid(secondIter));
@@ -324,7 +324,7 @@ int strnSkpCmp(const char* firstIter, const char* secondIter, size_t length)
  * @param haystackLen length of haystack
  * @return true if str is YES, false otherwise
  */
-bool strInArr(const char *needle, const char *haystack, const size_t lineLen, const size_t haystackLen)
+static bool strInArr(const char *needle, const char *haystack, const size_t lineLen, const size_t haystackLen)
 {
     assert(gPtrValid(needle));
     assert(gPtrValid(haystack));
@@ -337,24 +337,94 @@ bool strInArr(const char *needle, const char *haystack, const size_t lineLen, co
 
 
 /**
+ * @brief converts all letters in string to upper case, skips other chars
+ * @param buffer null-terminated string to convert
+ * @return pointer to buffer
+ */
+static char* upper(char *buffer)
+{
+    assert(gPtrValid(buffer));
+    char *bufferIter = buffer;
+    while (*bufferIter != '\0') {
+        *bufferIter = toupper(*bufferIter);
+        ++bufferIter;
+    }
+    return buffer;
+}
+
+
+/**
+ * @brief converts all letters in string to lower case, skips other chars
+ * @param buffer null-terminated string to convert
+ * @return pointer to buffer
+ */
+static char* lower(char *buffer) 
+{
+    assert(gPtrValid(buffer));
+    char *bufferIter = buffer;
+    while (*bufferIter != '\0') {
+        *bufferIter = tolower(*bufferIter);
+        ++bufferIter;
+    }
+    return buffer;
+}
+
+
+/**
+ * @brief converts the first letter in string to upper case, skips other chars
+ * @param buffer null-terminated string to convert
+ * @return pointer to buffer
+ */
+static char* capitalize(char *buffer) 
+{
+    assert(gPtrValid(buffer));
+    char *bufferIter = buffer;
+    while (!isalpha(*bufferIter) && *bufferIter != '\0')
+        ++bufferIter;
+    *bufferIter = toupper(*bufferIter);
+    return buffer;
+}
+
+
+/**
+ * @brief chechs if string is some version of comb (one of Comb, COMB, comb, c, C)
+ * @param str  null-terminated string to check
+ * @param comb null-terminated string to create combinations from
+ * @return true if str is a version of comb, false otherwise
+ */
+static bool strIsComb(const char *str, const char *comb) 
+{
+    assert(gPtrValid(str));
+    assert(gPtrValid(comb));
+
+    const size_t lineLen = strlen(comb) + 1;
+    const size_t arrLen  = 5; 
+    char buffer[lineLen + 1];
+    strcpy(buffer, comb);
+    char arr[arrLen][lineLen];    
+    strcpy(arr[0], upper(buffer));
+    strcpy(arr[1], lower(buffer));
+    strcpy(arr[2], capitalize(buffer));
+    arr[3][0] = buffer[0];
+    arr[4][0] = lower(buffer)[0];
+      
+    for (size_t i = 0; i < arrLen; ++i) {
+        fprintf(stderr, "%d. #%s#\n", i, arr[i]);
+    }
+      
+    return strInArr(str, (char *)arr, lineLen, arrLen);
+}
+
+
+/**
  * @brief chechs if string is some form of YES with skipping spaces
  * @param buffer string to check
  * @return true if str is YES, false otherwise
  */
-bool strIsYes(const char *buffer) 
+static bool strIsYes(const char *buffer) 
 {
     assert(gPtrValid(buffer));
-    const size_t arrLen = 5;
-    const size_t lineLen = 4;
-    const char arr[arrLen][lineLen] = {
-            "Yes",
-            "YES",
-            "yes",
-            "Y",
-            "y"
-        };
-
-    return strInArr(buffer, (const char*)arr, lineLen, arrLen);
+    return strIsComb(buffer, "yes");
 }
 
 
@@ -363,20 +433,10 @@ bool strIsYes(const char *buffer)
  * @param buffer string to check
  * @return true if str is NO, false otherwise
  */
-bool strIsNo(const char *buffer) 
+static bool strIsNo(const char *buffer) 
 {
     assert(gPtrValid(buffer));
-    const size_t arrLen = 5;
-    const size_t lineLen = 3;
-    const char arr[arrLen][lineLen] = {
-            "No",
-            "NO",
-            "no",
-            "N",
-            "n"
-        };
-
-    return strInArr(buffer, (const char*)arr, lineLen, arrLen);
+    return strIsComb(buffer, "no");
 }
 
 
@@ -385,20 +445,9 @@ bool strIsNo(const char *buffer)
  * @param buffer string to check
  * @return true if str is QUIT, false otherwise
  */
-bool strIsQuit(const char *buffer) 
+static bool strIsQuit(const char *buffer) 
 {
     assert(gPtrValid(buffer));
-    const size_t arrLen = 5;
-    const size_t lineLen = 5;
-    const char arr[arrLen][lineLen] = {
-            "Quit",
-            "QUIT",
-            "quit",
-            "Q",
-            "q"
-        };
-
-    return strInArr(buffer, (const char*)arr, lineLen, arrLen);
+    return strIsComb(buffer, "quit");
 }
-
 #endif
