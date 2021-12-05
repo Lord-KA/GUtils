@@ -81,7 +81,6 @@ static bool gPtrValid(const void* ptr)
 static char* strnchr(const char *haystack, char needle, size_t length) 
 {
     return (char*)memchr(haystack, needle, strnlen(haystack, length));
-
 }
 
 
@@ -236,7 +235,7 @@ finish:
  * @param direction equals 1 or -1 dependent on the intended direction of iterators 
  * @return -1 if first < second; 1 if first > second; 0 if first == second
  */
-int strSkpCmp(char* firstIter, char* secondIter, int direction)
+int strSkpCmp(const char* firstIter, const char* secondIter, int direction)
 {
     assert(direction == 1 || direction == -1);
     assert(gPtrValid(firstIter));
@@ -278,12 +277,13 @@ int strSkpCmp(char* firstIter, char* secondIter, int direction)
 * @param length number of non-space chars to compare
 * @return -1 if first < second; 1 if first > second; 0 if first == second
 */
-int strnSkpCmp(char* firstIter, char* secondIter, size_t length)
+int strnSkpCmp(const char* firstIter, const char* secondIter, size_t length)
 {
     assert(gPtrValid(firstIter));
     assert(gPtrValid(secondIter));
 
     while (*firstIter != '\0' && *secondIter != '\0' && length > 0) {
+        fprintf(stderr, "*firstIter = %d; *secondIter = %d\n", *firstIter, *secondIter);
         if (isspace(*(firstIter)))
             ++firstIter;
         else if (isspace(*(secondIter)))
@@ -317,24 +317,44 @@ int strnSkpCmp(char* firstIter, char* secondIter, size_t length)
 
 
 /**
+ * @brief chechs if needle is in the c-string array
+ * @param needle string to check
+ * @param haystack array of c-style strings to look in
+ * @param lineLen length of strings in haystack
+ * @param haystackLen length of haystack
+ * @return true if str is YES, false otherwise
+ */
+bool strInArr(const char *needle, const char *haystack, const size_t lineLen, const size_t haystackLen)
+{
+    assert(gPtrValid(needle));
+    assert(gPtrValid(haystack));
+
+    for (size_t i = 0; i < haystackLen; ++i)
+        if (!strSkpCmp(needle, (haystack + i * lineLen), 1))
+            return 1;
+    return 0;
+};
+
+
+/**
  * @brief chechs if string is some form of YES with skipping spaces
  * @param buffer string to check
  * @return true if str is YES, false otherwise
  */
-bool strIsYes(char *buffer) 
+bool strIsYes(const char *buffer) 
 {
     assert(gPtrValid(buffer));
-    if (!strSkpCmp(buffer, "Yes", 1))
-        return 1;
-    if (!strSkpCmp(buffer, "YES", 1))
-        return 1;
-    if (!strSkpCmp(buffer, "yes", 1))
-        return 1;
-    if (!strSkpCmp(buffer, "Y",   1))
-        return 1;
-    if (!strSkpCmp(buffer, "y",   1))
-        return 1;
-    return 0;
+    const size_t arrLen = 5;
+    const size_t lineLen = 4;
+    const char arr[arrLen][lineLen] = {
+            "Yes",
+            "YES",
+            "yes",
+            "Y",
+            "y"
+        };
+
+    return strInArr(buffer, (const char*)arr, lineLen, arrLen);
 }
 
 
@@ -343,20 +363,20 @@ bool strIsYes(char *buffer)
  * @param buffer string to check
  * @return true if str is NO, false otherwise
  */
-bool strIsNo(char *buffer) 
+bool strIsNo(const char *buffer) 
 {
     assert(gPtrValid(buffer));
-    if (!strSkpCmp(buffer, "No", 1))
-        return 1;
-    if (!strSkpCmp(buffer, "NO", 1))
-        return 1;
-    if (!strSkpCmp(buffer, "no", 1))
-        return 1;
-    if (!strSkpCmp(buffer, "N",  1))
-        return 1;
-    if (!strSkpCmp(buffer, "n",  1))
-        return 1;
-    return 0;
+    const size_t arrLen = 5;
+    const size_t lineLen = 3;
+    const char arr[arrLen][lineLen] = {
+            "No",
+            "NO",
+            "no",
+            "N",
+            "n"
+        };
+
+    return strInArr(buffer, (const char*)arr, lineLen, arrLen);
 }
 
 
@@ -365,20 +385,20 @@ bool strIsNo(char *buffer)
  * @param buffer string to check
  * @return true if str is QUIT, false otherwise
  */
-bool strIsQuit(char *buffer) 
+bool strIsQuit(const char *buffer) 
 {
     assert(gPtrValid(buffer));
-    if (!strSkpCmp(buffer, "Quit", 1))
-        return 1;
-    if (!strSkpCmp(buffer, "quit", 1))
-        return 1;
-    if (!strSkpCmp(buffer, "QUIT", 1))
-        return 1;
-    if (!strSkpCmp(buffer, "Q",    1))
-        return 1;
-    if (!strSkpCmp(buffer, "q",    1))
-        return 1;
-    return 0;
+    const size_t arrLen = 5;
+    const size_t lineLen = 5;
+    const char arr[arrLen][lineLen] = {
+            "Quit",
+            "QUIT",
+            "quit",
+            "Q",
+            "q"
+        };
+
+    return strInArr(buffer, (const char*)arr, lineLen, arrLen);
 }
 
 #endif
