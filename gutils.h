@@ -406,7 +406,9 @@ static bool strIsComb(const char *str, const char *comb)
     strcpy(arr[1], lower(buffer));
     strcpy(arr[2], capitalize(buffer));
     arr[3][0] = buffer[0];
+    arr[3][1] = '\0';
     arr[4][0] = lower(buffer)[0];
+    arr[4][1] = '\0';
       
     for (size_t i = 0; i < arrLen; ++i) {
         fprintf(stderr, "%d. #%s#\n", i, arr[i]);
