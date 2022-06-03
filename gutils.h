@@ -23,14 +23,14 @@
     }                                                                                     \
 })
 #else
-#define ASSERT_LOG(expr, errCode, errMsg, logStream)
+#define ASSERT_LOG(expr, errCode, errMsg, logStream) (expr)
 #endif
 
 
-/** 
- * @brief macro that are used in c-style pseudo-templates 
+/**
+ * @brief macro that are used in c-style pseudo-templates
  */
-#define CONCATENATE(A, B) A##_##B                   
+#define CONCATENATE(A, B) A##_##B
 #define TEMPLATE(func, TYPE) CONCATENATE(func, TYPE)
 
 
@@ -39,12 +39,12 @@
  * @param ptr pointer to check
  * @return true if valid, false otherwise
  */
-static bool gPtrValid(const void* ptr)       
+static bool gPtrValid(const void* ptr)
 {
     if (ptr == 0) {
         return false;
     }
-  
+
     #ifdef GUTILS_USE_PTR_SYS_CHECK
         #ifdef __unix__
             size_t page_size = sysconf(_SC_PAGESIZE);
@@ -55,20 +55,20 @@ static bool gPtrValid(const void* ptr)
                 MEMORY_BASIC_INFORMATION mbi = {};
                 if (!VirtualQuery(ptr, &mbi, sizeof (mbi)))
                     return false;
-  
+
                 if (mbi.Protect & (PAGE_GUARD | PAGE_NOACCESS))
                     return false;  // Guard page -> bad ptr
-    
+
                 DWORD readRights = PAGE_READONLY | PAGE_READWRITE | PAGE_WRITECOPY
                     | PAGE_EXECUTE_READ | PAGE_EXECUTE_READWRITE | PAGE_EXECUTE_WRITECOPY;
-    
+
                 return (mbi.Protect & readRights) != 0;
-            #else   
+            #else
                 fprintf(stderr, "WARNING: your OS is unsupported, system pointer checks are diabled!\n");
             #endif  /* _WIN32 */
         #endif  /* __unix__ */
     #endif  /* GUTILS_USE_PTR_SYS_CHECK */
-  
+
     return true;
 }
 
@@ -78,7 +78,7 @@ static bool gPtrValid(const void* ptr)
  * @param needle char to look for
  * @length length of haystack string
  */
-static char* strnchr(const char *haystack, char needle, size_t length) 
+static char* strnchr(const char *haystack, char needle, size_t length)
 {
     return (char*)memchr(haystack, needle, strnlen(haystack, length));
 }
@@ -109,9 +109,9 @@ static bool strnConsistsChrs(const char *haystack, const char* needles, size_t h
  * @haystack null-terminated c-style string to check
  * @return true if it is a correct integer, false otherwise
  */
-static bool isInteger(const char *haystack) 
+static bool isInteger(const char *haystack)
 {
-    /* 
+    /*
      * WARNING: haystack must be a null-terminated string
      */
 
@@ -140,7 +140,7 @@ static bool isInteger(const char *haystack)
         ++iter;
     if (*iter == '\0')
         return true;
-    else 
+    else
         return false;
 }
 
@@ -151,7 +151,7 @@ static bool isInteger(const char *haystack)
  * @return true if it is a correct double, false otherwise
  */
 static bool isDouble(const char *haystack) {
-    /* 
+    /*
      * WARNING: haystack must be a null-terminated string
      */
 
@@ -189,7 +189,7 @@ static bool isDouble(const char *haystack) {
         ++iter;
     if (*iter == '\0')
         return true;
-    else 
+    else
         return false;
 }
 
@@ -201,7 +201,7 @@ static bool isDouble(const char *haystack) {
  * @brief in filestream to read from
  * @return 0 if finished successfully, 1 otherwise
  */
-static bool getline(char *buffer, size_t bufferLen, FILE *in) 
+static bool getline(char *buffer, size_t bufferLen, FILE *in)
 {
     assert(gPtrValid(buffer));
     assert(gPtrValid(in));
@@ -214,9 +214,9 @@ static bool getline(char *buffer, size_t bufferLen, FILE *in)
     if (c == '\n' && in == stdin)
         c = fgetc(in);
     while (!feof(in) && c != '\n') {
-        if (curLen < bufferLen - 1) 
+        if (curLen < bufferLen - 1)
             buffer[curLen++] = c;
-        else 
+        else
             goto finish;
         c = fgetc(in);
     }
@@ -230,9 +230,9 @@ finish:
 
 /**
  * @brief compares strings with skipping all space chars
- * @param firstIter  pointer (iterator) to one c-style string 
- * @param secondIter pointer (iterator) to other c-style string 
- * @param direction equals 1 or -1 dependent on the intended direction of iterators 
+ * @param firstIter  pointer (iterator) to one c-style string
+ * @param secondIter pointer (iterator) to other c-style string
+ * @param direction equals 1 or -1 dependent on the intended direction of iterators
  * @return -1 if first < second; 1 if first > second; 0 if first == second
  */
 static int strSkpCmp(const char* firstIter, const char* secondIter, int direction)
@@ -247,7 +247,7 @@ static int strSkpCmp(const char* firstIter, const char* secondIter, int directio
         else if (isspace(*(secondIter)))
             secondIter += direction;
         else {
-            if (*(secondIter) < *(firstIter)) 
+            if (*(secondIter) < *(firstIter))
                return 1;
             if (*(secondIter) > *(firstIter))
                return -1;
@@ -261,7 +261,7 @@ static int strSkpCmp(const char* firstIter, const char* secondIter, int directio
     while (isspace(*secondIter) && *secondIter != '\0')
         secondIter += direction;
 
-    if (*firstIter < *secondIter) 
+    if (*firstIter < *secondIter)
         return -1;
     else if (*firstIter > *secondIter)
        return 1;
@@ -272,8 +272,8 @@ static int strSkpCmp(const char* firstIter, const char* secondIter, int directio
 
 /**
 * @brief compares first N non-space chars in strings
-* @param firstIter  pointer (iterator) to one c-style string 
-* @param secondIter pointer (iterator) to other c-style string 
+* @param firstIter  pointer (iterator) to one c-style string
+* @param secondIter pointer (iterator) to other c-style string
 * @param length number of non-space chars to compare
 * @return -1 if first < second; 1 if first > second; 0 if first == second
 */
@@ -290,7 +290,7 @@ static int strnSkpCmp(const char* firstIter, const char* secondIter, size_t leng
             ++secondIter;
         else {
             --length;
-            if (*(secondIter) < *(firstIter)) 
+            if (*(secondIter) < *(firstIter))
                 return 1;
             if (*(secondIter) > *(firstIter))
                 return -1;
@@ -307,7 +307,7 @@ static int strnSkpCmp(const char* firstIter, const char* secondIter, size_t leng
     while (isspace(*secondIter) && *secondIter != '\0')
         ++secondIter;
 
-    if (*firstIter < *secondIter) 
+    if (*firstIter < *secondIter)
         return -1;
     else if (*firstIter > *secondIter)
         return 1;
@@ -358,7 +358,7 @@ static char* upper(char *buffer)
  * @param buffer null-terminated string to convert
  * @return pointer to buffer
  */
-static char* lower(char *buffer) 
+static char* lower(char *buffer)
 {
     assert(gPtrValid(buffer));
     char *bufferIter = buffer;
@@ -375,7 +375,7 @@ static char* lower(char *buffer)
  * @param buffer null-terminated string to convert
  * @return pointer to buffer
  */
-static char* capitalize(char *buffer) 
+static char* capitalize(char *buffer)
 {
     assert(gPtrValid(buffer));
     char *bufferIter = buffer;
@@ -392,16 +392,16 @@ static char* capitalize(char *buffer)
  * @param comb null-terminated string to create combinations from
  * @return true if str is a version of comb, false otherwise
  */
-static bool strIsComb(const char *str, const char *comb) 
+static bool strIsComb(const char *str, const char *comb)
 {
     assert(gPtrValid(str));
     assert(gPtrValid(comb));
 
     const size_t lineLen = strlen(comb) + 1;
-    const size_t arrLen  = 5; 
+    const size_t arrLen  = 5;
     char buffer[lineLen + 1];
     strcpy(buffer, comb);
-    char arr[arrLen][lineLen];    
+    char arr[arrLen][lineLen];
     strcpy(arr[0], upper(buffer));
     strcpy(arr[1], lower(buffer));
     strcpy(arr[2], capitalize(buffer));
@@ -409,7 +409,7 @@ static bool strIsComb(const char *str, const char *comb)
     arr[3][1] = '\0';
     arr[4][0] = lower(buffer)[0];
     arr[4][1] = '\0';
-      
+
     return strInArr(str, (char *)arr, lineLen, arrLen);
 }
 
@@ -419,7 +419,7 @@ static bool strIsComb(const char *str, const char *comb)
  * @param buffer string to check
  * @return true if str is YES, false otherwise
  */
-static bool strIsYes(const char *buffer) 
+static bool strIsYes(const char *buffer)
 {
     assert(gPtrValid(buffer));
     return strIsComb(buffer, "yes");
@@ -431,7 +431,7 @@ static bool strIsYes(const char *buffer)
  * @param buffer string to check
  * @return true if str is NO, false otherwise
  */
-static bool strIsNo(const char *buffer) 
+static bool strIsNo(const char *buffer)
 {
     assert(gPtrValid(buffer));
     return strIsComb(buffer, "no");
@@ -443,7 +443,7 @@ static bool strIsNo(const char *buffer)
  * @param buffer string to check
  * @return true if str is QUIT, false otherwise
  */
-static bool strIsQuit(const char *buffer) 
+static bool strIsQuit(const char *buffer)
 {
     assert(gPtrValid(buffer));
     return strIsComb(buffer, "quit");
