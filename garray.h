@@ -49,4 +49,17 @@ static int GARR_GENERIC(gArr_push)(GARR_GENERIC(gArr) *arr, T elem)        // re
     ++arr->len;
     return 0;
 }
+
+static int GARR_GENERIC(gArr_cat)(GARR_GENERIC(gArr) *arr, const T *elems, size_t cnt)        // returns 0 if OK, 1 otherwise
+{
+    assert(arr != NULL);
+    assert(elems != NULL);
+    for (size_t i = 0; i < cnt; ++i) {
+        if (GARR_GENERIC(gArr_push)(arr, *elems))
+            return 1;
+        ++elems;
+    }
+    return 0;
+}
+
 #undef T
